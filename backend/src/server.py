@@ -8,11 +8,13 @@ from fastapi import FastAPI, status
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 import uvicorn
+from dotenv import load_dotenv
 
 from dal import ToDoDAL, ListSummary, ToDoList
 
+load_dotenv()
 COLLECTION_NAME = "todo_lists"
-MONGODB_URI = os.environ["MONGODB_URI"]
+MONGODB_URI = os.getenv('MONGODB_URI')
 DEBUG = os.environ.get("DEBUG", "").strip().lower() in {"1", "true", "on", "yes"}
 
 
@@ -20,7 +22,7 @@ DEBUG = os.environ.get("DEBUG", "").strip().lower() in {"1", "true", "on", "yes"
 async def lifespan(app: FastAPI):
     # Startup:
     client = AsyncIOMotorClient(MONGODB_URI)
-    database = client.get_default_database()
+    database = client.get_database("todo")
 
     # Ensure the database is available:
     pong = await database.command("ping")
